@@ -1,5 +1,7 @@
 import * as fs from 'fs'
 import chalk from 'chalk'
+import {getUserById} from './UserRepository';
+import { billUser } from './bill';
 
 export function cli(args) {
     // parse arguments
@@ -9,27 +11,30 @@ export function cli(args) {
 
     // perform billing
     if (operation.type == 'bill') {
-        const currentUser = store.find(item => item.id === Number(operation.userId))
+        // const currentUser = store.find(item => item.id === Number(operation.userId))
+        const currentUser = getUserById(operation.userId);
+        // bill user
+        billUser(currentUser, operation.amount);
         // check if user exists
-        if (!currentUser) {
-            throw new Error(`No user with id ${operation.userId}`);
-        }
+        // if (!currentUser) {
+        //     throw new Error(`No user with id ${operation.userId}`);
+        // }
         // check current user can be billed
-        if (currentUser.canWithdraw && currentUser.balance >= Number(operation.amount)) {
-            // update user balance
-            currentUser.balance -= operation.amount;
-            currentUser.canWithdraw = !(currentUser.amount === 0);
+        // if (currentUser.canWithdraw && currentUser.balance >= Number(operation.amount)) {
+        //     // update user balance
+        //     currentUser.balance -= operation.amount;
+        //     currentUser.canWithdraw = !(currentUser.amount === 0);
 
-            // update store with new user data to reflect the current amount
-            fs.writeFile(`${__dirname}/store.json`, JSON.stringify(store), function(err) {
-                if (err) {
-                    throw new Error(err.message)
-                }
-                console.log(chalk.greenBright(`Successfully billed ${currentUser.name} ${operation.amount}`));
-            })
-        } else {
-            throw new Error(`Unable to bill ${currentUser.name}`)
-        }
+        //     // update store with new user data to reflect the current amount
+        //     fs.writeFile(`${__dirname}/store.json`, JSON.stringify(store), function(err) {
+        //         if (err) {
+        //             throw new Error(err.message)
+        //         }
+        //         console.log(chalk.greenBright(`Successfully billed ${currentUser.name} ${operation.amount}`));
+        //     })
+        // } else {
+        //     throw new Error(`Unable to bill ${currentUser.name}`)
+        // }
     }
 }
 
